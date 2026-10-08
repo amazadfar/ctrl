@@ -1,4 +1,3 @@
-import { ChevronRightIcon } from '../components/Icons'
 import { BackButton } from '../components/Parts'
 import { cx, formatDay, formatTime, HELPED_LABEL } from '../format'
 import { useNav } from '../nav'
@@ -28,34 +27,29 @@ export function HistoryScreen() {
       <h1 className="title">History</h1>
 
       {sessions.length === 0 ? (
-        <p className="empty">Nothing yet. Engage a mode before something that matters, then check in afterwards.</p>
+        <p className="empty">Nothing logged yet. Engage a mode before something that matters, then check in afterwards.</p>
       ) : (
         <>
           {answered.length > 0 && (
             <p className="readout">
-              <strong>
-                {changedBehaviour.length} of {answered.length}
-              </strong>{' '}
-              {answered.length === 1 ? 'session' : 'sessions'} changed what you did.
+              Choosing a mode changed what you did in {changedBehaviour.length} of {answered.length}{' '}
+              {answered.length === 1 ? 'session' : 'sessions'}.
             </p>
           )}
           {days.map(([day, items]) => (
-            <section key={day}>
-              <h2 className="eyebrow section-label">{day}</h2>
-              <div className="list">
+            <section key={day} className="log-day">
+              <h2 className="log-date">{day}</h2>
+              <ul className="log">
                 {items.map((s) => (
-                  <button key={s.id} className="row" onClick={() => nav.push({ name: 'session', id: s.id })}>
-                    <span className="row-main">
-                      <span className="row-title">{s.modeName}</span>
-                      <span className="row-sub">
-                        {formatTime(s.startedAt)}–{formatTime(s.endedAt ?? s.endsAt)}
-                      </span>
-                    </span>
-                    {s.helped && <span className={cx('badge', `badge-${s.helped}`)}>{HELPED_LABEL[s.helped]}</span>}
-                    <ChevronRightIcon />
-                  </button>
+                  <li key={s.id}>
+                    <button className="log-row" onClick={() => nav.push({ name: 'session', id: s.id })}>
+                      <span className="log-time">{formatTime(s.startedAt)}</span>
+                      <span className="log-name">{s.modeName}</span>
+                      {s.helped && <span className={cx('annunciator', `is-${s.helped}`)}>{HELPED_LABEL[s.helped]}</span>}
+                    </button>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </section>
           ))}
         </>

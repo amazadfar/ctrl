@@ -14,13 +14,13 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       pwaAssets: { config: true, overrideManifestIcons: true },
-      workbox: { globPatterns: ['**/*.{js,css,html,png,ico,svg}'] },
+      workbox: { globPatterns: ['**/*.{js,css,html,png,ico,svg,woff2}'] },
       manifest: {
         name: 'CTRL',
         short_name: 'CTRL',
         description: 'Set your state.',
-        theme_color: '#0b0c0e',
-        background_color: '#0b0c0e',
+        theme_color: '#000000',
+        background_color: '#000000',
         display: 'standalone',
         orientation: 'portrait',
       },

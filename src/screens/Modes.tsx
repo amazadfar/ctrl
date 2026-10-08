@@ -1,40 +1,51 @@
 import { createMode } from '../actions'
-import { ChevronRightIcon, HistoryIcon, PlusIcon, SettingsIcon } from '../components/Icons'
-import { formatClock, levelLabel } from '../format'
+import { HistoryIcon, PlusIcon, SettingsIcon } from '../components/Icons'
+import { Fma } from '../components/Parts'
+import { Signature } from '../components/Tape'
+import { formatClock, formatMinutes, formatTime } from '../format'
 import { useNow } from '../hooks'
 import { useNav } from '../nav'
 import { useData } from '../store'
-import type { Level, Session } from '../types'
+import type { Session } from '../types'
 
-function ActiveBanner({ session }: { session: Session }) {
+/** Always-on status, like the annunciator strip on a flight deck: standby, or what's engaged. */
+function StatusBar({ session }: { session?: Session }) {
   const nav = useNav()
-  const left = session.endsAt - useNow()
+  const now = useNow()
+  if (!session) {
+    return (
+      <Fma
+        label="No mode engaged"
+        cells={[
+          { text: 'Standby', tone: 'dim' },
+          { text: '- -', tone: 'dim' },
+          { text: formatTime(now), tone: 'dim' },
+        ]}
+      />
+    )
+  }
+  const left = session.endsAt - now
   return (
-    <button className="banner" onClick={() => nav.push({ name: 'active' })}>
-      <span className="row-main">
-        <span className="row-title">
-          <span className="pulse" />
-          {session.modeName}
-        </span>
-        <span className="row-sub banner-sub">{left > 0 ? `${formatClock(left)} left` : "Time's up · check in"}</span>
-      </span>
-      <ChevronRightIcon />
-    </button>
+    <Fma
+      label={`${session.modeName} engaged. Open it.`}
+      onClick={() => nav.push({ name: 'active' })}
+      cells={[
+        { text: session.modeName, tone: 'green' },
+        left > 0 ? { text: formatClock(left) } : { text: "Time's up", tone: 'amber' },
+        { text: 'Open' },
+      ]}
+    />
   )
 }
 
 export function ModesScreen() {
   const data = useData()
   const nav = useNav()
-
-  const summary = (driverId: string, level: Level) => {
-    const driver = data.drivers.find((d) => d.id === driverId)
-    return driver ? `${driver.name} ${levelLabel(driver.labels, level).toLowerCase()}` : ''
-  }
+  const driverName = (id: string) => data.drivers.find((d) => d.id === id)?.name ?? 'Driver'
 
   return (
     <div className="screen">
-      <header className="topbar">
+      <header className="masthead">
         <span className="wordmark">CTRL</span>
         <span className="topbar-actions">
           <button className="icon-btn" aria-label="History" onClick={() => nav.push({ name: 'history' })}>
@@ -46,24 +57,32 @@ export function ModesScreen() {
         </span>
       </header>
 
-      {data.active && <ActiveBanner session={data.active} />}
+      <StatusBar session={data.active} />
 
-      <h2 className="eyebrow section-label">Modes</h2>
-      <div className="list">
-        {data.modes.map((mode) => (
-          <button key={mode.id} className="row" onClick={() => nav.push({ name: 'mode', id: mode.id })}>
-            <span className="row-main">
-              <span className="row-title">{mode.name.trim() || 'Untitled'}</span>
-              <span className="row-sub">{mode.drivers.map((md) => summary(md.driverId, md.level)).join(' · ')}</span>
-            </span>
-            <ChevronRightIcon />
-          </button>
-        ))}
-        <button className="row row-add" onClick={() => nav.push({ name: 'edit', id: createMode() })}>
-          <PlusIcon />
-          New mode
-        </button>
-      </div>
+      {data.modes.length === 0 && <p className="empty">No modes yet. Make one for the next thing that matters.</p>}
+
+      <ul className="modes">
+        {data.modes.map((mode) => {
+          const names = mode.drivers.map((md) => driverName(md.driverId).toLowerCase()).join(', ')
+          return (
+            <li key={mode.id}>
+              <button className="mode-row" onClick={() => nav.push({ name: 'mode', id: mode.id })}>
+                <Signature levels={mode.drivers.map((md) => md.level)} />
+                <span className="mode-main">
+                  <span className="mode-name">{mode.name.trim() || 'Untitled'}</span>
+                  {names && <span className="mode-sub">{names.charAt(0).toUpperCase() + names.slice(1)}</span>}
+                </span>
+                <span className="mode-dur">{formatMinutes(mode.minutes)}</span>
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+
+      <button className="add-btn" onClick={() => nav.push({ name: 'edit', id: createMode() })}>
+        <PlusIcon />
+        New mode
+      </button>
     </div>
   )
 }

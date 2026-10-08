@@ -1,6 +1,6 @@
 import { startSession } from '../actions'
-import { BackButton, DriverView, RuleView } from '../components/Parts'
-import { formatMinutes } from '../format'
+import { BackButton, DriverStrip, RuleView, Section } from '../components/Parts'
+import { formatDuration } from '../format'
 import { haptic } from '../haptics'
 import { useNav } from '../nav'
 import { useData } from '../store'
@@ -13,6 +13,10 @@ export function ModeScreen({ id }: { id: string }) {
   if (!mode) return null
 
   const rules = mode.rules.filter((r) => r.cue.trim() || r.action.trim())
+  const drivers = mode.drivers.map((md) => {
+    const driver = data.drivers.find((d) => d.id === md.driverId)
+    return { ...md, name: driver?.name ?? 'Missing driver', labels: driver?.labels ?? [] }
+  })
 
   const engage = () => {
     haptic()
@@ -30,38 +34,26 @@ export function ModeScreen({ id }: { id: string }) {
           </button>
         </header>
         <h1 className="title">{mode.name.trim() || 'Untitled'}</h1>
+        <p className="lede">Runs for {formatDuration(mode.minutes)}</p>
 
-        {mode.drivers.length > 0 && (
-          <>
-            <h2 className="eyebrow section-label">Drivers</h2>
-            {mode.drivers.map((md) => {
-              const driver = data.drivers.find((d) => d.id === md.driverId)
-              return (
-                <DriverView
-                  key={md.driverId}
-                  name={driver?.name ?? 'Missing driver'}
-                  labels={driver?.labels ?? []}
-                  level={md.level}
-                  note={md.note.trim()}
-                />
-              )
-            })}
-          </>
+        {drivers.length > 0 && (
+          <Section title="Drivers">
+            <DriverStrip drivers={drivers} />
+          </Section>
         )}
 
         {rules.length > 0 && (
-          <>
-            <h2 className="eyebrow section-label">Rules</h2>
+          <Section title="Rules">
             <div className="rules">
               {rules.map((rule, i) => (
                 <RuleView key={i} rule={rule} />
               ))}
             </div>
-          </>
+          </Section>
         )}
 
-        {mode.drivers.length === 0 && rules.length === 0 && (
-          <p className="hint">Nothing set yet. Tap Edit to choose drivers and write rules.</p>
+        {drivers.length === 0 && rules.length === 0 && (
+          <p className="empty">Nothing set yet. Edit this mode to choose drivers and write rules.</p>
         )}
       </div>
 
@@ -73,7 +65,7 @@ export function ModeScreen({ id }: { id: string }) {
             </button>
           ) : (
             <button className="btn btn-primary" onClick={engage}>
-              Engage · {formatMinutes(mode.minutes)}
+              Engage
             </button>
           )}
         </div>

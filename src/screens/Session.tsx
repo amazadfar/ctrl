@@ -1,6 +1,7 @@
 import { deleteSession } from '../actions'
-import { BackButton, RuleView } from '../components/Parts'
-import { CHANGED_LABEL, formatDay, formatTime, HELPED_LABEL, levelLabel } from '../format'
+import { Gauge } from '../components/Gauge'
+import { BackButton, DriverStrip, RuleView, Section } from '../components/Parts'
+import { CHANGED_LABEL, cx, formatDay, formatTime, HELPED_LABEL } from '../format'
 import { useNav } from '../nav'
 import { useData } from '../store'
 
@@ -22,76 +23,60 @@ export function SessionScreen({ id }: { id: string }) {
     <div className="screen">
       <header className="topbar">
         <BackButton label="History" />
-        <button className="link danger" onClick={remove}>
+        <button className="link is-caution" onClick={remove}>
           Delete
         </button>
       </header>
       <h1 className="title">{session.modeName}</h1>
       <p className="lede">
-        {formatDay(session.startedAt)} · {formatTime(session.startedAt)}–{formatTime(session.endedAt ?? session.endsAt)}
+        {formatDay(session.startedAt)}, {formatTime(session.startedAt)} to {formatTime(session.endedAt ?? session.endsAt)}
       </p>
 
-      <div className="stats">
-        <div className="stat">
-          <span className="eyebrow">Changed what I did</span>
-          <span className="stat-value">{session.changed ? CHANGED_LABEL[session.changed] : '—'}</span>
+      <dl className="verdicts">
+        <div>
+          <dt>Changed what I did</dt>
+          <dd className={cx(session.changed && session.changed !== 'no' && 'is-green')}>
+            {session.changed ? CHANGED_LABEL[session.changed] : 'Not answered'}
+          </dd>
         </div>
-        <div className="stat">
-          <span className="eyebrow">Helped</span>
-          <span className="stat-value">{session.helped ? HELPED_LABEL[session.helped] : '—'}</span>
+        <div>
+          <dt>Did it help</dt>
+          <dd className={cx(session.helped === 'better' && 'is-green', session.helped === 'worse' && 'is-amber')}>
+            {session.helped ? HELPED_LABEL[session.helped] : 'Not answered'}
+          </dd>
         </div>
-      </div>
+      </dl>
 
       {readings.length > 0 && (
-        <>
-          <h2 className="eyebrow section-label">State</h2>
-          <div className="table">
-            <div className="table-row table-head">
-              <span />
-              <span>Before</span>
-              <span>After</span>
-            </div>
+        <Section title="State" aside="grey before, white after">
+          <div className="gauges">
             {readings.map((r) => (
-              <div className="table-row" key={r.signalId}>
-                <span>{r.name}</span>
-                <span>{r.before ? levelLabel(r.labels, r.before) : '—'}</span>
-                <span>{r.after ? levelLabel(r.labels, r.after) : '—'}</span>
-              </div>
+              <Gauge key={r.signalId} name={r.name} labels={r.labels} value={r.after} ghost={r.before} />
             ))}
           </div>
-        </>
+        </Section>
       )}
 
       {session.drivers.length > 0 && (
-        <>
-          <h2 className="eyebrow section-label">Drivers</h2>
-          <div className="table">
-            {session.drivers.map((d) => (
-              <div className="table-row is-pair" key={d.driverId}>
-                <span>{d.name}</span>
-                <span className="accent">{levelLabel(d.labels, d.level)}</span>
-              </div>
-            ))}
-          </div>
-        </>
+        <Section title="Drivers">
+          <DriverStrip drivers={session.drivers} />
+        </Section>
       )}
 
       {session.rules.length > 0 && (
-        <>
-          <h2 className="eyebrow section-label">Rules</h2>
+        <Section title="Rules">
           <div className="rules">
             {session.rules.map((rule, i) => (
               <RuleView key={i} rule={rule} />
             ))}
           </div>
-        </>
+        </Section>
       )}
 
       {session.note && (
-        <>
-          <h2 className="eyebrow section-label">Note</h2>
+        <Section title="Note">
           <p className="note">{session.note}</p>
-        </>
+        </Section>
       )}
     </div>
   )

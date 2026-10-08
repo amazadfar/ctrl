@@ -2,15 +2,34 @@ import { useRef } from 'react'
 import { createScale, replaceData, type ScaleKind } from '../actions'
 import { exportBackup, readBackup } from '../backup'
 import { ChevronRightIcon, PlusIcon } from '../components/Icons'
-import { BackButton } from '../components/Parts'
+import { BackButton, Section } from '../components/Parts'
 import { levelLabel } from '../format'
 import { useNav } from '../nav'
 import { useData } from '../store'
 
 const SECTIONS: { kind: ScaleKind; title: string; hint: string; add: string }[] = [
-  { kind: 'signals', title: 'State', hint: 'What you observe. You name these before and after.', add: 'Add signal' },
+  { kind: 'signals', title: 'State', hint: 'What you observe. You read these gauges before and after.', add: 'Add signal' },
   { kind: 'drivers', title: 'Drivers', hint: 'What you choose. Modes set these.', add: 'Add driver' },
 ]
+
+/** A tiny gauge for state signals, a tiny tape for drivers: the same instruments the app uses for each. */
+function ScaleGlyph({ kind }: { kind: ScaleKind }) {
+  return (
+    <svg className="glyph" viewBox="0 0 36 36" aria-hidden="true">
+      {kind === 'signals' ? (
+        <>
+          <path className="glyph-arc" d="M6.74 26.5 A13 13 0 1 1 29.26 26.5" />
+          <line className="glyph-needle" x1={18} y1={20} x2={26.7} y2={15} />
+        </>
+      ) : (
+        <>
+          <line className="sig-spine" x1={18} y1={5} x2={18} y2={31} />
+          <line className="sig-bug" x1={12} y1={11.5} x2={24} y2={11.5} />
+        </>
+      )}
+    </svg>
+  )
+}
 
 export function SettingsScreen() {
   const data = useData()
@@ -38,54 +57,51 @@ export function SettingsScreen() {
       <h1 className="title">Settings</h1>
 
       {SECTIONS.map(({ kind, title, hint, add }) => (
-        <section key={kind}>
-          <h2 className="eyebrow section-label">{title}</h2>
-          <p className="hint tight">{hint}</p>
-          <div className="list">
+        <Section key={kind} title={title}>
+          <p className="hint">{hint}</p>
+          <ul className="settings-list">
             {data[kind].map((scale) => (
-              <button key={scale.id} className="row is-compact" onClick={() => nav.push({ name: 'scale', kind, id: scale.id })}>
-                <span className="row-main">
-                  <span className="row-title">{scale.name.trim() || 'Untitled'}</span>
-                  <span className="row-sub">
-                    {levelLabel(scale.labels, 1)} → {levelLabel(scale.labels, 5)}
+              <li key={scale.id}>
+                <button className="setting-row" onClick={() => nav.push({ name: 'scale', kind, id: scale.id })}>
+                  <ScaleGlyph kind={kind} />
+                  <span className="setting-main">
+                    <span className="setting-name">{scale.name.trim() || 'Untitled'}</span>
+                    <span className="setting-sub">
+                      {levelLabel(scale.labels, 1)} to {levelLabel(scale.labels, 5).toLowerCase()}
+                    </span>
                   </span>
-                </span>
-                <ChevronRightIcon />
-              </button>
+                  <ChevronRightIcon />
+                </button>
+              </li>
             ))}
-            <button className="row row-add" onClick={() => nav.push({ name: 'scale', kind, id: createScale(kind) })}>
-              <PlusIcon />
-              {add}
-            </button>
-          </div>
-        </section>
+          </ul>
+          <button className="add-btn" onClick={() => nav.push({ name: 'scale', kind, id: createScale(kind) })}>
+            <PlusIcon />
+            {add}
+          </button>
+        </Section>
       ))}
 
-      <h2 className="eyebrow section-label">Backup</h2>
-      <p className="hint tight">
-        Everything lives on this phone only. Removing CTRL from your Home Screen deletes it, so export now and then.
-      </p>
-      <div className="list">
-        <button className="row is-compact" onClick={() => exportBackup(data)}>
-          <span className="row-main">
-            <span className="row-title">Export backup</span>
-          </span>
-        </button>
-        <button className="row is-compact" onClick={() => fileInput.current?.click()}>
-          <span className="row-main">
-            <span className="row-title">Import backup</span>
-          </span>
-        </button>
-      </div>
-      <input
-        ref={fileInput}
-        type="file"
-        accept="application/json,.json"
-        hidden
-        onChange={(e) => onImport(e.target.files?.[0])}
-      />
+      <Section title="Backup">
+        <p className="hint">Everything lives on this phone only. Removing CTRL from your Home Screen deletes it, so export now and then.</p>
+        <div className="button-row">
+          <button className="btn btn-secondary" onClick={() => exportBackup(data)}>
+            Export backup
+          </button>
+          <button className="btn btn-secondary" onClick={() => fileInput.current?.click()}>
+            Import backup
+          </button>
+        </div>
+        <input
+          ref={fileInput}
+          type="file"
+          accept="application/json,.json"
+          hidden
+          onChange={(e) => onImport(e.target.files?.[0])}
+        />
+      </Section>
 
-      <p className="build">CTRL · build {__BUILD__}</p>
+      <p className="build">Build {__BUILD__}</p>
     </div>
   )
 }

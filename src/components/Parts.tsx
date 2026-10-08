@@ -1,10 +1,10 @@
-import { useLayoutEffect, useRef } from 'react'
-import { cx, levelLabel } from '../format'
+import { Fragment, useLayoutEffect, useRef, type ReactNode } from 'react'
+import { cx } from '../format'
 import { haptic } from '../haptics'
 import { useNav } from '../nav'
 import type { Level, Rule } from '../types'
-import { Dial } from './Dial'
 import { ChevronLeftIcon } from './Icons'
+import { Tape } from './Tape'
 
 export function BackButton({ label }: { label: string }) {
   const nav = useNav()
@@ -13,6 +13,18 @@ export function BackButton({ label }: { label: string }) {
       <ChevronLeftIcon />
       {label}
     </button>
+  )
+}
+
+export function Section({ title, aside, children }: { title: string; aside?: ReactNode; children: ReactNode }) {
+  return (
+    <section className="section">
+      <h2 className="section-title">
+        <span>{title}</span>
+        {aside && <span className="section-aside">{aside}</span>}
+      </h2>
+      {children}
+    </section>
   )
 }
 
@@ -44,30 +56,74 @@ export function GrowingTextarea({ value, placeholder, label, onChange }: Growing
   )
 }
 
-export function DriverView({ name, labels, level, note }: { name: string; labels: string[]; level: Level; note: string }) {
+export interface StripDriver {
+  driverId: string
+  name: string
+  labels: string[]
+  level: Level
+  note: string
+}
+
+/** Read-only drivers: tapes side by side like channel strips, with what each level means underneath. */
+export function DriverStrip({ drivers }: { drivers: StripDriver[] }) {
+  const notes = drivers.filter((d) => d.note.trim())
   return (
-    <div className="driver">
-      <div className="driver-head">
-        <span className="driver-name">{name}</span>
-        <span className="driver-value">{levelLabel(labels, level)}</span>
+    <>
+      <div className="strip">
+        {drivers.map((d) => (
+          <div className="strip-col" key={d.driverId}>
+            <Tape value={d.level} labels={d.labels} name={d.name} />
+            <span className="strip-name">{d.name}</span>
+          </div>
+        ))}
       </div>
-      <Dial value={level} labels={labels} label={name} />
-      {note && <p className="driver-note">{note}</p>}
+      {notes.length > 0 && (
+        <dl className="notes">
+          {notes.map((d) => (
+            <Fragment key={d.driverId}>
+              <dt>{d.name}</dt>
+              <dd>{d.note}</dd>
+            </Fragment>
+          ))}
+        </dl>
+      )}
+    </>
+  )
+}
+
+/** Rules read like a flight-deck procedure: the condition in white, the action to take in cyan. */
+export function RuleView({ rule, large }: { rule: Rule; large?: boolean }) {
+  return (
+    <div className={cx('rule', large && 'is-large')}>
+      <p className="rule-cue">
+        <span className="rule-if">If</span> {rule.cue || '…'}
+      </p>
+      <p className="rule-action">{rule.action || '…'}</p>
     </div>
   )
 }
 
-export function RuleView({ rule, large }: { rule: Rule; large?: boolean }) {
-  return (
-    <div className={cx('rule', large && 'is-large')}>
-      <p className="rule-line">
-        <span className="rule-key">If</span>
-        <span>{rule.cue || '…'}</span>
-      </p>
-      <p className="rule-line">
-        <span className="rule-key">Then</span>
-        <span>{rule.action || '…'}</span>
-      </p>
+export interface FmaCell {
+  text: string
+  tone?: 'green' | 'amber' | 'dim'
+  /** Draws the box a flight deck shows around a newly engaged mode. */
+  boxed?: boolean
+}
+
+/** A flight-mode annunciator: the strip above a pilot's main display that says what's engaged. */
+export function Fma({ cells, onClick, label }: { cells: FmaCell[]; onClick?: () => void; label?: string }) {
+  const content = cells.map((cell, i) => (
+    <span key={i} className={cx('fma-cell', cell.tone && `is-${cell.tone}`, cell.boxed && 'is-boxed')}>
+      {cell.text}
+    </span>
+  ))
+  return onClick ? (
+    <button className="fma is-button" onClick={onClick} aria-label={label}>
+      {content}
+    </button>
+  ) : (
+    <div className="fma" role="status" aria-label={label}>
+      {content}
     </div>
   )
 }

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { finishSession, setReading } from '../actions'
-import { SignalRow } from '../components/Meter'
-import { BackButton, Choice, GrowingTextarea } from '../components/Parts'
-import { CHANGED_LABEL, formatTime, HELPED_LABEL, levelLabel } from '../format'
+import { Gauge } from '../components/Gauge'
+import { BackButton, Choice, GrowingTextarea, Section } from '../components/Parts'
+import { CHANGED_LABEL, formatTime, HELPED_LABEL } from '../format'
 import { haptic } from '../haptics'
 import { useNav } from '../nav'
 import { useData } from '../store'
@@ -16,6 +16,8 @@ export function CheckInScreen() {
   const [note, setNote] = useState('')
   const session = data.active
   if (!session) return null
+
+  const hasBefore = session.readings.some((r) => r.before)
 
   const save = () => {
     haptic()
@@ -31,41 +33,44 @@ export function CheckInScreen() {
         </header>
         <h1 className="title">Check in</h1>
         <p className="lede">
-          {session.modeName} · {formatTime(session.startedAt)}–{formatTime(Math.min(Date.now(), session.endsAt))}
+          {session.modeName}, {formatTime(session.startedAt)} to {formatTime(Math.min(Date.now(), session.endsAt))}
         </p>
 
         {session.readings.length > 0 && (
-          <>
-            <h2 className="eyebrow section-label">State now</h2>
-            <div className="signals">
+          <Section title="State now">
+            {hasBefore && <p className="hint">Grey needles show where you started.</p>}
+            <div className="gauges">
               {session.readings.map((r) => (
-                <SignalRow
+                <Gauge
                   key={r.signalId}
                   name={r.name}
                   labels={r.labels}
                   value={r.after}
-                  hint={r.before ? `was ${levelLabel(r.labels, r.before).toLowerCase()}` : undefined}
+                  ghost={r.before}
                   onChange={(level) => setReading(r.signalId, 'after', level)}
                 />
               ))}
             </div>
-          </>
+          </Section>
         )}
 
-        <h2 className="eyebrow section-label">Did choosing this change what you did?</h2>
-        <Choice label="Changed what you did" options={CHANGED_LABEL} value={changed} onChange={setChanged} />
+        <Section title="Did choosing this change what you did?">
+          <Choice label="Changed what you did" options={CHANGED_LABEL} value={changed} onChange={setChanged} />
+        </Section>
 
-        <h2 className="eyebrow section-label">Did it help?</h2>
-        <Choice label="Did it help" options={HELPED_LABEL} value={helped} onChange={setHelped} />
+        <Section title="Did it help?">
+          <Choice label="Did it help" options={HELPED_LABEL} value={helped} onChange={setHelped} />
+        </Section>
 
-        <h2 className="eyebrow section-label">Note</h2>
-        <GrowingTextarea value={note} placeholder="What worked, what didn't." label="Note" onChange={setNote} />
+        <Section title="Note">
+          <GrowingTextarea value={note} placeholder="What worked, what didn't." label="Note" onChange={setNote} />
+        </Section>
       </div>
 
       <div className="actionbar">
         <div className="actionbar-inner">
           <button className="btn btn-primary" onClick={save}>
-            Save
+            Save check-in
           </button>
         </div>
       </div>

@@ -26,6 +26,12 @@ export function formatMinutes(minutes: number): string {
   return minutes < 60 ? `${minutes}m` : `${minutes / 60}h`
 }
 
+export function formatDuration(minutes: number): string {
+  if (minutes < 60) return `${minutes} minutes`
+  const hours = minutes / 60
+  return hours === 1 ? '1 hour' : `${hours} hours`
+}
+
 export function formatTime(t: number): string {
   return new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
