@@ -1,4 +1,4 @@
-import { isData } from './store'
+import { isData, normalize } from './store'
 import type { Data } from './types'
 
 export async function exportBackup(data: Data): Promise<void> {
@@ -26,5 +26,5 @@ export async function exportBackup(data: Data): Promise<void> {
 export async function readBackup(file: File): Promise<Data> {
   const parsed: unknown = JSON.parse(await file.text())
   if (!isData(parsed)) throw new Error('Not a CTRL backup')
-  return parsed
+  return normalize(parsed)
 }

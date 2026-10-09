@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
 import { discardSession, setReading } from '../actions'
 import { Gauge } from '../components/Gauge'
-import { BackButton, DriverStrip, Fma, RuleView, Section } from '../components/Parts'
+import { BackButton, DriverList, Fma, RuleView, Section } from '../components/Parts'
 import { cx, formatClock, formatTime } from '../format'
 import { useNow } from '../hooks'
 import { useNav } from '../nav'
@@ -20,7 +20,7 @@ export function ActiveScreen() {
     return (
       <div className="screen">
         <header className="topbar">
-          <BackButton label="Modes" />
+          <BackButton label="CTRL" />
         </header>
         <p className="empty">No mode is engaged.</p>
       </div>
@@ -32,7 +32,7 @@ export function ActiveScreen() {
 
   const discard = () => {
     if (!confirm('Discard this session? Nothing will be saved.')) return
-    nav.reset({ name: 'modes' })
+    nav.reset({ name: 'home' })
     discardSession()
   }
 
@@ -40,7 +40,7 @@ export function ActiveScreen() {
     <>
       <div className="screen has-actionbar">
         <header className="topbar">
-          <BackButton label="Modes" />
+          <BackButton label="CTRL" />
           <button className="link is-caution" onClick={discard}>
             Discard
           </button>
@@ -98,7 +98,7 @@ export function ActiveScreen() {
 
         {session.drivers.length > 0 && (
           <Section title="Drivers">
-            <DriverStrip drivers={session.drivers} />
+            <DriverList drivers={session.drivers} />
           </Section>
         )}
       </div>

@@ -62,12 +62,18 @@ export interface Session {
   changed?: Changed
   helped?: Helped
   note?: string
+  /** Desk levels from before this mode was engaged; the desk returns to them when it ends. */
+  returnTo?: Record<string, Level>
 }
 
 export interface Data {
   version: 1
   signals: Scale[]
   drivers: Scale[]
+  /** The desk (free mode): where every driver is set right now. Missing means the middle. */
+  levels: Record<string, Level>
+  /** Why each driver is at its level right now, in your words. */
+  notes: Record<string, string>
   modes: Mode[]
   /** Finished sessions, newest first. */
   sessions: Session[]

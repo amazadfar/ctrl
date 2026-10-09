@@ -12,7 +12,7 @@ const SECTIONS: { kind: ScaleKind; title: string; hint: string; add: string }[] 
   { kind: 'drivers', title: 'Drivers', hint: 'What you choose. Modes set these.', add: 'Add driver' },
 ]
 
-/** A tiny gauge for state signals, a tiny tape for drivers: the same instruments the app uses for each. */
+/** A tiny gauge for state signals, a tiny volume bar for drivers: the same instruments the app uses for each. */
 function ScaleGlyph({ kind }: { kind: ScaleKind }) {
   return (
     <svg className="glyph" viewBox="0 0 36 36" aria-hidden="true">
@@ -23,8 +23,8 @@ function ScaleGlyph({ kind }: { kind: ScaleKind }) {
         </>
       ) : (
         <>
-          <line className="sig-spine" x1={18} y1={5} x2={18} y2={31} />
-          <line className="sig-bug" x1={12} y1={11.5} x2={24} y2={11.5} />
+          <rect className="sig-track" x={3} y={16} width={30} height={5} rx={2.5} />
+          <rect className="sig-fill" x={3} y={16} width={24} height={5} rx={2.5} />
         </>
       )}
     </svg>
@@ -52,7 +52,7 @@ export function SettingsScreen() {
   return (
     <div className="screen">
       <header className="topbar">
-        <BackButton label="Modes" />
+        <BackButton label="CTRL" />
       </header>
       <h1 className="title">Settings</h1>
 

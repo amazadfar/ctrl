@@ -2,11 +2,9 @@
 
 Set your state.
 
-- **State**: what you observe (anxiety, confidence, energy, focus). Named before and after, five levels.
-- **Drivers**: what you choose (importance, curiosity, assertiveness, frame…). Up to three per mode.
-- **Rules**: if → then. Up to two per mode.
+The first screen is the **desk**: an iOS-style volume bar for every driver (importance, curiosity, assertiveness, frame…). Slide them freely. Tap a driver's name to see its five levels in your words and note why it's set where it is.
 
-Set modes up at home; engaging one takes two taps. Afterwards, check in: state now, whether choosing it changed what you did, whether it helped.
+**Modes** are optional presets underneath. A mode sets up to three drivers, adds up to two if → then rules, and runs on a timer. Engaging one recalls its levels onto the desk; checking in afterwards puts the desk back. At check-in you read your **state** (anxiety, confidence, energy, focus) on gauges, say whether choosing the mode changed what you did and whether it helped.
 
 Everything is stored on the phone (no backend, no account). Settings → Export backup.
 

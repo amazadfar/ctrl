@@ -22,7 +22,7 @@ export function HistoryScreen() {
   return (
     <div className="screen">
       <header className="topbar">
-        <BackButton label="Modes" />
+        <BackButton label="CTRL" />
       </header>
       <h1 className="title">History</h1>
 

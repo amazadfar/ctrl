@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { deleteScale, updateScale, type ScaleKind } from '../actions'
 import { Gauge } from '../components/Gauge'
 import { BackButton, Section } from '../components/Parts'
-import { Tape } from '../components/Tape'
+import { Volume } from '../components/Volume'
 import { useNav } from '../nav'
 import { useData } from '../store'
 import { LEVELS, type Level } from '../types'
@@ -33,7 +33,7 @@ export function ScaleScreen({ kind, id }: { kind: ScaleKind; id: string }) {
   return (
     <div className="screen">
       <header className="topbar">
-        <BackButton label="Settings" />
+        <BackButton label="Back" />
       </header>
       <input
         className="title-input"
@@ -47,7 +47,7 @@ export function ScaleScreen({ kind, id }: { kind: ScaleKind; id: string }) {
         {kind === 'signals' ? (
           <Gauge name={name} labels={scale.labels} value={preview} onChange={(level) => level && setPreview(level)} />
         ) : (
-          <Tape name={name} labels={scale.labels} value={preview} onChange={setPreview} />
+          <Volume name={name} labels={scale.labels} value={preview} size="large" onChange={setPreview} />
         )}
       </div>
 

@@ -35,11 +35,22 @@ export function deleteMode(id: string) {
   setData((d) => ({ ...d, modes: d.modes.filter((m) => m.id !== id) }))
 }
 
+export function setLevel(driverId: string, level: Level) {
+  setData((d) => ({ ...d, levels: { ...d.levels, [driverId]: level } }))
+}
+
+export function setNote(driverId: string, note: string) {
+  setData((d) => ({ ...d, notes: { ...d.notes, [driverId]: note } }))
+}
+
+/** Engaging a mode recalls its levels onto the desk, like a preset; the desk is restored when it ends. */
 export function startSession(mode: Mode) {
   setData((d) => {
     const startedAt = Date.now()
     const driver = (id: string) => d.drivers.find((s) => s.id === id)
+    const recalled = Object.fromEntries(mode.drivers.map((md) => [md.driverId, md.level]))
     const active: Session = {
+      returnTo: d.levels,
       id: newId(),
       modeId: mode.id,
       modeName: mode.name.trim() || 'Untitled',
@@ -54,7 +65,7 @@ export function startSession(mode: Mode) {
       rules: mode.rules.filter((r) => r.cue.trim() || r.action.trim()),
       readings: d.signals.map((s) => ({ signalId: s.id, name: s.name, labels: s.labels })),
     }
-    return { ...d, active }
+    return { ...d, active, levels: { ...d.levels, ...recalled } }
   })
 }
 
@@ -71,19 +82,20 @@ export function setReading(signalId: string, when: 'before' | 'after', level: Le
 export function finishSession(result: { changed?: Changed; helped?: Helped; note: string }) {
   setData((d) => {
     if (!d.active) return d
+    const { returnTo, ...rest } = d.active
     const session: Session = {
-      ...d.active,
+      ...rest,
       endedAt: Math.min(Date.now(), d.active.endsAt),
       changed: result.changed,
       helped: result.helped,
       note: result.note.trim() || undefined,
     }
-    return { ...d, active: undefined, sessions: [session, ...d.sessions] }
+    return { ...d, active: undefined, levels: returnTo ?? d.levels, sessions: [session, ...d.sessions] }
   })
 }
 
 export function discardSession() {
-  setData((d) => ({ ...d, active: undefined }))
+  setData((d) => ({ ...d, active: undefined, levels: d.active?.returnTo ?? d.levels }))
 }
 
 export function deleteSession(id: string) {

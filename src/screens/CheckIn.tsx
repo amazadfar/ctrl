@@ -22,7 +22,7 @@ export function CheckInScreen() {
   const save = () => {
     haptic()
     finishSession({ changed, helped, note })
-    nav.reset({ name: 'modes' }, { name: 'history' })
+    nav.reset({ name: 'home' }, { name: 'history' })
   }
 
   return (

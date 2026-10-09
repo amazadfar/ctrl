@@ -1,10 +1,10 @@
-import { Fragment, useLayoutEffect, useRef, type ReactNode } from 'react'
-import { cx } from '../format'
+import { useLayoutEffect, useRef, type ReactNode } from 'react'
+import { cx, levelLabel } from '../format'
 import { haptic } from '../haptics'
 import { useNav } from '../nav'
 import type { Level, Rule } from '../types'
 import { ChevronLeftIcon } from './Icons'
-import { Tape } from './Tape'
+import { Volume } from './Volume'
 
 export function BackButton({ label }: { label: string }) {
   const nav = useNav()
@@ -56,7 +56,7 @@ export function GrowingTextarea({ value, placeholder, label, onChange }: Growing
   )
 }
 
-export interface StripDriver {
+export interface ListedDriver {
   driverId: string
   name: string
   labels: string[]
@@ -64,30 +64,21 @@ export interface StripDriver {
   note: string
 }
 
-/** Read-only drivers: tapes side by side like channel strips, with what each level means underneath. */
-export function DriverStrip({ drivers }: { drivers: StripDriver[] }) {
-  const notes = drivers.filter((d) => d.note.trim())
+/** Read-only drivers: each one's volume bar, its level in words, and what that level means here. */
+export function DriverList({ drivers }: { drivers: ListedDriver[] }) {
   return (
-    <>
-      <div className="strip">
-        {drivers.map((d) => (
-          <div className="strip-col" key={d.driverId}>
-            <Tape value={d.level} labels={d.labels} name={d.name} />
-            <span className="strip-name">{d.name}</span>
+    <div className="desk">
+      {drivers.map((d) => (
+        <div className="bar-row" key={d.driverId}>
+          <div className="bar-head">
+            <span className="bar-name">{d.name}</span>
+            <span className="bar-level">{levelLabel(d.labels, d.level)}</span>
           </div>
-        ))}
-      </div>
-      {notes.length > 0 && (
-        <dl className="notes">
-          {notes.map((d) => (
-            <Fragment key={d.driverId}>
-              <dt>{d.name}</dt>
-              <dd>{d.note}</dd>
-            </Fragment>
-          ))}
-        </dl>
-      )}
-    </>
+          <Volume value={d.level} labels={d.labels} name={d.name} />
+          {d.note.trim() && <p className="bar-note">{d.note}</p>}
+        </div>
+      ))}
+    </div>
   )
 }
 

@@ -2,7 +2,8 @@ import { createContext, useContext } from 'react'
 import type { ScaleKind } from './actions'
 
 export type Route =
-  | { name: 'modes' }
+  | { name: 'home' }
+  | { name: 'driver'; id: string }
   | { name: 'mode'; id: string }
   | { name: 'edit'; id: string }
   | { name: 'active' }

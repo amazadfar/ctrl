@@ -1,5 +1,5 @@
 import { startSession } from '../actions'
-import { BackButton, DriverStrip, RuleView, Section } from '../components/Parts'
+import { BackButton, DriverList, RuleView, Section } from '../components/Parts'
 import { formatDuration } from '../format'
 import { haptic } from '../haptics'
 import { useNav } from '../nav'
@@ -21,24 +21,27 @@ export function ModeScreen({ id }: { id: string }) {
   const engage = () => {
     haptic()
     startSession(mode)
-    nav.reset({ name: 'modes' }, { name: 'active' })
+    nav.reset({ name: 'home' }, { name: 'active' })
   }
 
   return (
     <>
       <div className="screen has-actionbar">
         <header className="topbar">
-          <BackButton label="Modes" />
+          <BackButton label="CTRL" />
           <button className="link" onClick={() => nav.push({ name: 'edit', id })}>
             Edit
           </button>
         </header>
         <h1 className="title">{mode.name.trim() || 'Untitled'}</h1>
-        <p className="lede">Runs for {formatDuration(mode.minutes)}</p>
+        <p className="lede">
+          Runs for {formatDuration(mode.minutes)}. Engaging sets these drivers on your desk; they go back when you
+          check in.
+        </p>
 
         {drivers.length > 0 && (
           <Section title="Drivers">
-            <DriverStrip drivers={drivers} />
+            <DriverList drivers={drivers} />
           </Section>
         )}
 

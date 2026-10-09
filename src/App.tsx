@@ -2,19 +2,21 @@ import { useEffect, useMemo, useState } from 'react'
 import { NavContext, type Nav, type Route } from './nav'
 import { ActiveScreen } from './screens/Active'
 import { CheckInScreen } from './screens/CheckIn'
+import { DriverScreen } from './screens/Driver'
 import { HistoryScreen } from './screens/History'
+import { HomeScreen } from './screens/Home'
 import { ModeScreen } from './screens/Mode'
 import { ModeEditorScreen } from './screens/ModeEditor'
-import { ModesScreen } from './screens/Modes'
 import { ScaleScreen } from './screens/Scale'
 import { SessionScreen } from './screens/Session'
 import { SettingsScreen } from './screens/Settings'
-import { getData } from './store'
 
 function Screen({ route }: { route: Route }) {
   switch (route.name) {
-    case 'modes':
-      return <ModesScreen />
+    case 'home':
+      return <HomeScreen />
+    case 'driver':
+      return <DriverScreen id={route.id} />
     case 'mode':
       return <ModeScreen id={route.id} />
     case 'edit':
@@ -35,10 +37,8 @@ function Screen({ route }: { route: Route }) {
 }
 
 export function App() {
-  // Reopening the app mid-session lands straight on the engaged mode.
-  const [stack, setStack] = useState<Route[]>(() =>
-    getData().active ? [{ name: 'modes' }, { name: 'active' }] : [{ name: 'modes' }],
-  )
+  // The desk is always the first page; an engaged mode shows in its status bar.
+  const [stack, setStack] = useState<Route[]>([{ name: 'home' }])
 
   const nav = useMemo<Nav>(
     () => ({

@@ -1,8 +1,8 @@
 import { deleteMode, updateMode } from '../actions'
 import { PlusIcon } from '../components/Icons'
 import { GrowingTextarea, Section } from '../components/Parts'
-import { Tape } from '../components/Tape'
-import { cx, DURATIONS, formatMinutes } from '../format'
+import { Volume } from '../components/Volume'
+import { cx, DURATIONS, formatMinutes, levelLabel } from '../format'
 import { useNav } from '../nav'
 import { useData } from '../store'
 import { MAX_DRIVERS, MAX_RULES, type Mode, type ModeDriver, type Rule } from '../types'
@@ -26,7 +26,7 @@ export function ModeEditorScreen({ id }: { id: string }) {
 
   const remove = () => {
     if (!confirm(`Delete “${mode.name.trim() || 'Untitled'}”?`)) return
-    nav.reset({ name: 'modes' })
+    nav.reset({ name: 'home' })
     deleteMode(id)
   }
 
@@ -47,32 +47,37 @@ export function ModeEditorScreen({ id }: { id: string }) {
       />
 
       <Section title="Drivers" aside={`${mode.drivers.length} of ${MAX_DRIVERS}`}>
-        <p className="hint">What you choose. Drag each one to the level this situation needs.</p>
-        <div className="strip is-editing">
+        <p className="hint">What you choose. Slide each one to the level this situation needs.</p>
+        <div className="desk">
           {mode.drivers.map((md, i) => {
             const driver = driverOf(md.driverId)
+            const labels = driver?.labels ?? []
             return (
-              <div className="strip-col" key={md.driverId}>
-                <Tape
+              <div className="bar-row is-editing" key={md.driverId}>
+                <div className="bar-head">
+                  <select
+                    className="driver-select"
+                    value={md.driverId}
+                    aria-label="Driver"
+                    onChange={(e) => patchDriver(i, { driverId: e.target.value })}
+                  >
+                    {data.drivers
+                      .filter((d) => d.id === md.driverId || !used.has(d.id))
+                      .map((d) => (
+                        <option key={d.id} value={d.id}>
+                          {d.name.trim() || 'Untitled'}
+                        </option>
+                      ))}
+                  </select>
+                  <span className="bar-level">{levelLabel(labels, md.level)}</span>
+                </div>
+                <Volume
                   value={md.level}
-                  labels={driver?.labels ?? []}
+                  labels={labels}
                   name={driver?.name ?? 'Driver'}
                   onChange={(level) => patchDriver(i, { level })}
                 />
-                <select
-                  className="strip-select"
-                  value={md.driverId}
-                  aria-label="Driver"
-                  onChange={(e) => patchDriver(i, { driverId: e.target.value })}
-                >
-                  {data.drivers
-                    .filter((d) => d.id === md.driverId || !used.has(d.id))
-                    .map((d) => (
-                      <option key={d.id} value={d.id}>
-                        {d.name.trim() || 'Untitled'}
-                      </option>
-                    ))}
-                </select>
+                <GrowingTextarea value={md.note} placeholder="What this level means here" onChange={(note) => patchDriver(i, { note })} />
                 <button
                   className="text-btn is-caution"
                   onClick={() => update((m) => ({ ...m, drivers: m.drivers.filter((_, j) => j !== i) }))}
@@ -82,33 +87,15 @@ export function ModeEditorScreen({ id }: { id: string }) {
               </div>
             )
           })}
-          {mode.drivers.length < MAX_DRIVERS && nextDriver && (
-            <button
-              className="strip-col strip-empty"
-              onClick={() => update((m) => ({ ...m, drivers: [...m.drivers, { driverId: nextDriver.id, level: 3, note: '' }] }))}
-            >
-              <span className="strip-empty-spine" />
-              <span className="strip-empty-label">
-                <PlusIcon />
-                Add driver
-              </span>
-            </button>
-          )}
         </div>
-
-        {mode.drivers.length > 0 && (
-          <div className="note-fields">
-            {mode.drivers.map((md, i) => (
-              <label className="note-field" key={md.driverId}>
-                <span className="note-field-name">{driverOf(md.driverId)?.name ?? 'Driver'}</span>
-                <GrowingTextarea
-                  value={md.note}
-                  placeholder="What this level means here"
-                  onChange={(note) => patchDriver(i, { note })}
-                />
-              </label>
-            ))}
-          </div>
+        {mode.drivers.length < MAX_DRIVERS && nextDriver && (
+          <button
+            className="add-btn"
+            onClick={() => update((m) => ({ ...m, drivers: [...m.drivers, { driverId: nextDriver.id, level: 3, note: '' }] }))}
+          >
+            <PlusIcon />
+            Add driver
+          </button>
         )}
       </Section>
 

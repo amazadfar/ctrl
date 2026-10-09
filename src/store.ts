@@ -1,12 +1,22 @@
 import { useSyncExternalStore } from 'react'
 import { defaultData } from './defaults'
-import type { Data } from './types'
+import type { Data, Level } from './types'
 
 const KEY = 'ctrl.data'
 
 export function isData(value: unknown): value is Data {
   const d = value as Data | null
   return !!d && d.version === 1 && [d.signals, d.drivers, d.modes, d.sessions].every((x) => Array.isArray(x))
+}
+
+/** Fills in fields added after the first release, so older saved data and backups still load. */
+export function normalize(d: Data): Data {
+  return { ...d, levels: d.levels ?? {}, notes: d.notes ?? {} }
+}
+
+/** Where a driver sits on the desk; untouched drivers start in the middle. */
+export function levelOf(d: Data, driverId: string): Level {
+  return d.levels[driverId] ?? 3
 }
 
 function load(): Data {
@@ -19,7 +29,7 @@ function load(): Data {
   if (raw) {
     try {
       const parsed: unknown = JSON.parse(raw)
-      if (isData(parsed)) return parsed
+      if (isData(parsed)) return normalize(parsed)
     } catch {
       // Unreadable JSON: handled below.
     }

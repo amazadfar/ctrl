@@ -7,6 +7,8 @@ const scale = (id: string, name: string, labels = GENERIC): Scale => ({ id, name
 export function defaultData(): Data {
   return {
     version: 1,
+    levels: {},
+    notes: {},
     signals: [
       scale('anxiety', 'Anxiety'),
       scale('confidence', 'Confidence'),

@@ -1,6 +1,6 @@
 import { deleteSession } from '../actions'
 import { Gauge } from '../components/Gauge'
-import { BackButton, DriverStrip, RuleView, Section } from '../components/Parts'
+import { BackButton, DriverList, RuleView, Section } from '../components/Parts'
 import { CHANGED_LABEL, cx, formatDay, formatTime, HELPED_LABEL } from '../format'
 import { useNav } from '../nav'
 import { useData } from '../store'
@@ -59,7 +59,7 @@ export function SessionScreen({ id }: { id: string }) {
 
       {session.drivers.length > 0 && (
         <Section title="Drivers">
-          <DriverStrip drivers={session.drivers} />
+          <DriverList drivers={session.drivers} />
         </Section>
       )}
 
