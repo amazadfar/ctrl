@@ -23,8 +23,9 @@ function ScaleGlyph({ kind }: { kind: ScaleKind }) {
         </>
       ) : (
         <>
-          <rect className="sig-track" x={3} y={16} width={30} height={5} rx={2.5} />
-          <rect className="sig-fill" x={3} y={16} width={24} height={5} rx={2.5} />
+          <rect className="sig-track" x={3} y={16.5} width={30} height={3} rx={1.5} />
+          <rect className="sig-fill" x={3} y={16.5} width={21} height={3} rx={1.5} />
+          <rect className="sig-thumb" x={18} y={13} width={12} height={10} rx={5} />
         </>
       )}
     </svg>

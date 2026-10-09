@@ -35,7 +35,7 @@ export function DriverScreen({ id }: { id: string }) {
       )}
 
       <p className="detail-level">{levelLabel(driver.labels, level)}</p>
-      <Volume name={driver.name} labels={driver.labels} value={level} size="large" onChange={(l) => setLevel(id, l)} />
+      <Volume name={driver.name} labels={driver.labels} value={level} onChange={(l) => setLevel(id, l)} />
 
       <div className="level-list" role="radiogroup" aria-label={`${driver.name} level`}>
         {LEVELS.map((l) => (

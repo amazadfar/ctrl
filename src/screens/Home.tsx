@@ -65,25 +65,26 @@ export function HomeScreen() {
       {data.drivers.length === 0 ? (
         <p className="empty">No drivers yet. Add some in Settings.</p>
       ) : (
-        <div className="desk">
-          {data.drivers.map((driver) => {
-            const level = levelOf(data, driver.id)
-            const note = data.notes[driver.id]?.trim()
-            return (
-              <div key={driver.id} className={cx('bar-row', engaged && !inMode.has(driver.id) && 'is-dim')}>
-                <div className="bar-head">
-                  <button className="bar-name" onClick={() => nav.push({ name: 'driver', id: driver.id })}>
-                    {driver.name.trim() || 'Untitled'}
+        <>
+          <div className="group">
+            {data.drivers.map((driver) => {
+              const level = levelOf(data, driver.id)
+              const note = data.notes[driver.id]?.trim()
+              return (
+                <div key={driver.id} className={cx('group-row', engaged && !inMode.has(driver.id) && 'is-dim')}>
+                  <button className="slider-head" onClick={() => nav.push({ name: 'driver', id: driver.id })}>
+                    <span className="slider-name">{driver.name.trim() || 'Untitled'}</span>
+                    <span className="slider-value">{levelLabel(driver.labels, level)}</span>
                     <ChevronRightIcon />
                   </button>
-                  <span className="bar-level">{levelLabel(driver.labels, level)}</span>
+                  <Volume name={driver.name} labels={driver.labels} value={level} onChange={(l) => setLevel(driver.id, l)} />
+                  {note && <p className="slider-note">{note}</p>}
                 </div>
-                <Volume name={driver.name} labels={driver.labels} value={level} onChange={(l) => setLevel(driver.id, l)} />
-                {note && <p className="bar-note">{note}</p>}
-              </div>
-            )
-          })}
-        </div>
+              )
+            })}
+          </div>
+          <p className="group-footer">Tap a driver to see its levels in your words and note why it's set there.</p>
+        </>
       )}
 
       <Section title="Modes" aside="optional presets">

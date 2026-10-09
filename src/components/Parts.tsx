@@ -82,7 +82,7 @@ export function DriverList({ drivers }: { drivers: ListedDriver[] }) {
   )
 }
 
-/** Rules read like a flight-deck procedure: the condition in white, the action to take in cyan. */
+/** Rules read like a flight-deck procedure: the condition in white, the action to take in the tint. */
 export function RuleView({ rule, large }: { rule: Rule; large?: boolean }) {
   return (
     <div className={cx('rule', large && 'is-large')}>

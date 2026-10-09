@@ -47,7 +47,7 @@ export function ScaleScreen({ kind, id }: { kind: ScaleKind; id: string }) {
         {kind === 'signals' ? (
           <Gauge name={name} labels={scale.labels} value={preview} onChange={(level) => level && setPreview(level)} />
         ) : (
-          <Volume name={name} labels={scale.labels} value={preview} size="large" onChange={setPreview} />
+          <Volume name={name} labels={scale.labels} value={preview} onChange={setPreview} />
         )}
       </div>
 

@@ -1,15 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" fill="#000"/>
-  <g stroke-linecap="round">
-    <line x1="270" y1="112" x2="270" y2="400" stroke="#3b424b" stroke-width="14"/>
-    <line x1="270" y1="196" x2="270" y2="400" stroke="#ff5fd2" stroke-opacity=".55" stroke-width="14"/>
-    <g stroke="#59616b" stroke-width="12">
-      <line x1="294" y1="136" x2="334" y2="136"/>
-      <line x1="294" y1="256" x2="334" y2="256"/>
-      <line x1="294" y1="316" x2="334" y2="316"/>
-      <line x1="294" y1="376" x2="334" y2="376"/>
-    </g>
-    <line x1="294" y1="196" x2="374" y2="196" stroke="#ff5fd2" stroke-width="16"/>
-  </g>
-  <path transform="translate(160 160) scale(6)" fill="#ff5fd2" d="M0 0H9L15 6L9 12H0V8.5H5.5V3.5H0Z"/>
+  <line x1="104" y1="256" x2="408" y2="256" stroke="#3a3a3e" stroke-width="28" stroke-linecap="round"/>
+  <line x1="104" y1="256" x2="300" y2="256" stroke="#0a84ff" stroke-width="28" stroke-linecap="round"/>
+  <rect x="236" y="214" width="128" height="84" rx="42" fill="#fff"/>
 </svg>

@@ -38,6 +38,28 @@ export const PlusIcon = () => (
   </Icon>
 )
 
+/** Speaker glyphs for the ends of a volume slider, as in iOS Settings. */
+const SPEAKER = 'M2 9h3l4.4-3.6c.5-.4 1.1-.1 1.1.5v12.2c0 .6-.6.9-1.1.5L5 15H2a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1z'
+
+export const SpeakerIcon = () => (
+  <svg className="speaker" width={13} height={22} viewBox="0 0 13 24" aria-hidden="true">
+    <path d={SPEAKER} fill="currentColor" />
+  </svg>
+)
+
+export const SpeakerLoudIcon = () => (
+  <svg className="speaker" width={25} height={22} viewBox="0 0 27 24" aria-hidden="true">
+    <path d={SPEAKER} fill="currentColor" />
+    <path
+      d="M14 9.2a4 4 0 0 1 0 5.6M17 6.8a7.5 7.5 0 0 1 0 10.4M20 4.4a11 11 0 0 1 0 15.2"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.7}
+      strokeLinecap="round"
+    />
+  </svg>
+)
+
 export const HistoryIcon = () => (
   <Icon>
     <circle cx="12" cy="12" r="8.5" />

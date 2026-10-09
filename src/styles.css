@@ -1,11 +1,9 @@
 /*
- * CTRL is a glass cockpit for the self. Colors follow flight-display convention,
- * and each one means exactly one thing:
- *   magenta  a target you set (drivers)
- *   white    a value you observe (state)
- *   green    engaged / on
- *   cyan     an action you can take
- *   amber    caution
+ * CTRL is a glass cockpit for the self, with iOS controls. Each color means one thing:
+ *   blue   the tint: what you set (drivers) and what you can press, as on iOS
+ *   white  a value you observe (state)
+ *   green  engaged / on
+ *   amber  caution
  * Type is B612, the typeface Airbus designed for cockpit displays.
  */
 :root {
@@ -16,8 +14,9 @@
   --grey: #8b95a1;
   --grey-2: #59616b;
   --white: #eef1f4;
-  --magenta: #ff5fd2;
-  --cyan: #4fd8ff;
+  --tint: #0a84ff;
+  --card: #1c1c1e;
+  --separator: #38383a;
   --green: #4be37a;
   --amber: #ffb22e;
   --font: 'B612', -apple-system, system-ui, sans-serif;
@@ -80,7 +79,7 @@ button {
 }
 
 :focus-visible {
-  outline: 2px solid var(--cyan);
+  outline: 2px solid var(--tint);
   outline-offset: 2px;
 }
 
@@ -156,7 +155,7 @@ button {
 
 .title-input:focus {
   outline: none;
-  border-bottom-color: var(--cyan);
+  border-bottom-color: var(--tint);
 }
 
 .lede {
@@ -221,7 +220,7 @@ button {
   gap: 2px;
   min-height: 44px;
   font-size: 16px;
-  color: var(--cyan);
+  color: var(--tint);
 }
 
 .back {
@@ -266,7 +265,7 @@ button {
   min-height: 48px;
   margin-top: 8px;
   font-size: 15px;
-  color: var(--cyan);
+  color: var(--tint);
 }
 
 .btn {
@@ -345,7 +344,11 @@ button {
 }
 
 .sig-fill {
-  fill: var(--magenta);
+  fill: var(--tint);
+}
+
+.sig-thumb {
+  fill: var(--white);
 }
 
 /* ---------- Flight-mode annunciator ---------- */
@@ -549,79 +552,175 @@ button {
   stroke-linecap: round;
 }
 
-/* ---------- Drivers: volume bars ---------- */
+/* ---------- Drivers: iOS sliders ---------- */
 
-/* Like the iOS volume slider: a pill with no knob that thickens under your finger. */
+/* Exactly the iOS Settings volume slider: thin track, tinted fill, white capsule thumb, speakers at the ends. */
 .volume {
+  --thumb-w: 38px;
+  --thumb-h: 24px;
   display: flex;
   align-items: center;
-  height: 36px;
-  cursor: grab;
+  gap: 12px;
+  height: 44px;
+  color: var(--grey);
   touch-action: pan-y;
   -webkit-user-select: none;
   user-select: none;
 }
 
-.volume.is-dragging {
-  cursor: grabbing;
-}
-
 .volume:focus-visible {
   outline-offset: 2px;
-  border-radius: 8px;
+  border-radius: 12px;
+}
+
+.speaker {
+  flex: none;
+}
+
+.volume-area {
+  position: relative;
+  flex: 1;
+  height: 100%;
+}
+
+.volume-track,
+.volume-fill {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 5px;
+  margin-top: -2.5px;
+  border-radius: 999px;
 }
 
 .volume-track {
-  position: relative;
-  width: 100%;
-  height: 8px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
-  transition:
-    height 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.volume.is-held .volume-track {
-  height: 16px;
+  right: 0;
+  background: rgba(120, 120, 128, 0.36);
 }
 
 .volume-fill {
-  position: absolute;
-  inset: 0 auto 0 0;
-  background: var(--magenta);
+  background: var(--tint);
   transition: width 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Follow the finger exactly while dragging; settle with a glide on release. */
+.volume-thumb {
+  position: absolute;
+  top: 50%;
+  width: var(--thumb-w);
+  height: var(--thumb-h);
+  margin-top: calc(var(--thumb-h) / -2);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow:
+    0 0.5px 1.5px rgba(0, 0, 0, 0.25),
+    0 3px 10px rgba(0, 0, 0, 0.35);
+  transition:
+    left 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 160ms ease;
+}
+
+/* Follow the finger exactly while dragging; glide to the nearest level on release. */
 .volume.is-dragging .volume-fill {
   transition: none;
 }
 
-.volume.is-dragging .volume-track {
-  transition: height 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+.volume.is-dragging .volume-thumb {
+  transition: transform 160ms ease;
 }
 
-.volume.is-large {
-  height: 48px;
-}
-
-.volume.is-large .volume-track {
-  height: 14px;
-}
-
-.volume.is-large.is-held .volume-track {
-  height: 26px;
+.volume.is-held .volume-thumb {
+  transform: scale(1.12);
 }
 
 .volume.is-readonly {
-  height: 14px;
-  cursor: default;
+  --thumb-w: 12px;
+  --thumb-h: 12px;
+  height: 18px;
 }
 
-.volume.is-readonly .volume-track {
-  height: 6px;
+.volume.is-readonly .volume-track,
+.volume.is-readonly .volume-fill {
+  height: 4px;
+  margin-top: -2px;
+}
+
+.volume.is-readonly .volume-thumb {
+  box-shadow: none;
+}
+
+/* An iOS grouped list: rounded card, inset hairlines, footnote underneath. */
+.group {
+  margin-top: 18px;
+  overflow: hidden;
+  border-radius: 26px;
+  background: var(--card);
+}
+
+.group-row {
+  position: relative;
+  padding: 8px 16px 4px;
+}
+
+.group-row + .group-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 16px;
+  height: 0.5px;
+  background: var(--separator);
+}
+
+.slider-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-height: 36px;
+  text-align: left;
+}
+
+.slider-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 16px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.slider-value {
+  font-size: 15px;
+  color: var(--grey);
+}
+
+.slider-head .chev svg {
+  width: 16px;
+  height: 16px;
+}
+
+.slider-note {
+  margin: -4px 0 8px;
+  overflow: hidden;
+  font-size: 13px;
+  color: var(--grey);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.group-row.is-dim .slider-name {
+  color: var(--grey-2);
+}
+
+.group-row.is-dim .volume-fill,
+.group-row.is-dim .volume-thumb {
+  opacity: 0.4;
+}
+
+.group-footer {
+  margin: 8px 16px 0;
+  font-size: 13px;
+  color: var(--grey);
 }
 
 .desk {
@@ -662,7 +761,7 @@ button {
 .bar-level {
   font-size: 15px;
   font-weight: 700;
-  color: var(--magenta);
+  color: var(--tint);
   white-space: nowrap;
 }
 
@@ -702,7 +801,7 @@ button {
   appearance: none;
   -webkit-appearance: none;
   background: transparent
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5l3 3 3-3' fill='none' stroke='%234fd8ff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5l3 3 3-3' fill='none' stroke='%230a84ff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
     no-repeat right 8px center / 10px;
   border: 1px solid var(--line-2);
   border-radius: 4px;
@@ -723,14 +822,14 @@ button {
 
 .rule-then {
   font-weight: 700;
-  color: var(--cyan);
+  color: var(--tint);
 }
 
 .rule-action {
   position: relative;
   margin-top: 4px;
   padding-left: 20px;
-  color: var(--cyan);
+  color: var(--tint);
 }
 
 .rule-action::before {
@@ -797,7 +896,7 @@ button {
 .field:focus,
 .input:focus {
   outline: none;
-  border-color: var(--cyan);
+  border-color: var(--tint);
 }
 
 .seg {
@@ -820,8 +919,8 @@ button {
 }
 
 .seg-btn.is-selected {
-  color: var(--magenta);
-  box-shadow: inset 0 0 0 1.5px var(--magenta);
+  color: var(--tint);
+  box-shadow: inset 0 0 0 1.5px var(--tint);
 }
 
 /* Push-buttons with a light bar, like a cockpit mode-control panel: lit means on. */
@@ -1054,8 +1153,8 @@ button {
     animation: none;
   }
 
-  .volume-track,
   .volume-fill,
+  .volume-thumb,
   .choice-btn::before {
     transition: none;
   }
@@ -1140,7 +1239,7 @@ button {
   font-size: 34px;
   font-weight: 700;
   line-height: 1.15;
-  color: var(--magenta);
+  color: var(--tint);
 }
 
 .level-list {
@@ -1163,7 +1262,7 @@ button {
 
 .level-option.is-set {
   font-weight: 700;
-  color: var(--magenta);
+  color: var(--tint);
 }
 
 .level-meter {
@@ -1181,7 +1280,7 @@ button {
 }
 
 .level-option.is-set .level-meter > span {
-  background: var(--magenta);
+  background: var(--tint);
 }
 
 .scale-preview .volume {
